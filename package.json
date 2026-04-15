@@ -6,12 +6,15 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "adhocquery:local": "wrangler d1 execute --local parking_spots_db --command \"$(cat src/adhoc-query.sql)\"",
-    "adhocquery:remote": "wrangler d1 execute --remote parking_spots_db --command \"$(cat src/adhoc-query.sql)\""
+    "adhocquery:local": "wrangler d1 execute --local parking_spots_db --command \"$(cat src/adhocQuery.sql)\"",
+    "adhocquery:remote": "wrangler d1 execute --remote parking_spots_db --command \"$(cat src/adhocQuery.sql)\""
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260415.1",
     "typescript": "^6.0.2",
     "wrangler": "^4.82.2"
+  },
+  "dependencies": {
+    "itty-router": "^5.0.23"
   }
 }
