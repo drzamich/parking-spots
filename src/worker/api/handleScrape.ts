@@ -2,7 +2,7 @@ import { IRequest } from "itty-router";
 import { Env } from "../types";
 import { runScraper } from "./runScraper";
 
-export const handleScrape = async (request: IRequest, env: Env): Promise<Response> => {
+export const handleScrape = async (_request: IRequest, env: Env): Promise<Response> => {
   try {
     const result = await runScraper(env);
     return new Response(

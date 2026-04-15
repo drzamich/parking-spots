@@ -9,7 +9,7 @@ export default {
   async scheduled(
     event: ScheduledEvent,
     env: Env,
-    ctx: ExecutionContext,
+    _ctx: ExecutionContext,
   ): Promise<void> {
     console.log(
       `Cron triggered at ${new Date(event.scheduledTime).toISOString()}`,
