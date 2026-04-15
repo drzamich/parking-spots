@@ -1,9 +1,15 @@
+import { useState } from 'react'
+import { LoginForm } from './components/LoginForm'
+import { DataViewer } from './components/DataViewer'
+
 function App() {
-  return (
-    <div>
-      <h1>Hello World</h1>
-    </div>
-  )
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  if (!isAuthenticated) {
+    return <LoginForm onLoginSuccess={() => setIsAuthenticated(true)} />
+  }
+
+  return <DataViewer onLogout={() => setIsAuthenticated(false)} />
 }
 
 export default App
