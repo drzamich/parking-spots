@@ -1,0 +1,15 @@
+{
+  "name": "parking-spots",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for scraping free parking spots",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260415.1",
+    "typescript": "^6.0.2",
+    "wrangler": "^4.82.2"
+  }
+}

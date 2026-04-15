@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+.pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.dev.vars
+
+# Build/Runtime
+.wrangler/
+dist/
+*.tmp
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
