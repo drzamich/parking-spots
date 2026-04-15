@@ -1,22 +1,40 @@
 {
   "name": "parking-spots",
-  "version": "1.0.0",
-  "description": "Cloudflare Worker for scraping free parking spots",
-  "main": "src/index.ts",
+  "description": "Cloudflare Worker for scraping free parking spots with React Dashboard",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "pnpm run build && wrangler dev",
-    "build:frontend": "cd src/frontend && pnpm build",
-    "build": "pnpm build:frontend",
-    "deploy": "pnpm build && wrangler deploy",
-    "adhocquery:local": "wrangler d1 execute --local parking_spots_db --command \"$(cat src/api/adhocQuery.sql)\"",
-    "adhocquery:remote": "wrangler d1 execute --remote parking_spots_db --command \"$(cat src/api/adhocQuery.sql)\""
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260415.1",
-    "typescript": "^6.0.2",
-    "wrangler": "^4.82.2"
+    "build": "tsc -b && vite build",
+    "cf-typegen": "wrangler types",
+    "check": "tsc && vite build && wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "dev": "vite",
+    "lint": "eslint .",
+    "preview": "npm run build && vite preview",
+    "adhocquery:local": "wrangler d1 execute --local parking_spots_db --command \"$(cat src/worker/api/adhocQuery.sql)\"",
+    "adhocquery:remote": "wrangler d1 execute --remote parking_spots_db --command \"$(cat src/worker/api/adhocQuery.sql)\""
   },
   "dependencies": {
-    "itty-router": "^5.0.23"
+    "itty-router": "^5.0.23",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.15.3",
+    "@cloudflare/workers-types": "^4.20260415.1",
+    "@eslint/js": "9.39.1",
+    "@types/node": "^24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.1",
+    "eslint": "9.39.2",
+    "eslint-plugin-react-hooks": "7.0.1",
+    "eslint-plugin-react-refresh": "0.4.24",
+    "globals": "16.5.0",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.48.0",
+    "vite": "^6.0.0",
+    "wrangler": "^4.83.0"
   }
 }
