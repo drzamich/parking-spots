@@ -36,18 +36,21 @@ const COLORS = {
   warynskiego: '#28a745'
 };
 
+const TIME_RANGES = [
+  { label: 'Last hour', value: '1' },
+  { label: 'Last 6 hours', value: '6' },
+  { label: 'Last 12 hours', value: '12' },
+  { label: 'Last day', value: '24' },
+  { label: 'Last 3 days', value: '72' },
+  { label: 'Last 7 days', value: '168' },
+];
+
 export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
   const [data, setData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedLocations, setSelectedLocations] = useState<string[]>(['krasinski']);
-
-  const [from, setFrom] = useState(() => {
-    const date = new Date();
-    date.setHours(date.getHours() - 24);
-    return date.toISOString().slice(0, 16);
-  });
-  const [to, setTo] = useState(() => new Date().toISOString().slice(0, 16));
+  const [timeRange, setTimeRange] = useState('24');
 
   const toggleLocation = (locationId: string) => {
     setSelectedLocations(prev => 
@@ -65,10 +68,13 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
     setLoading(true);
     setError(null);
     try {
+      const toDate = new Date();
+      const fromDate = new Date(toDate.getTime() - parseInt(timeRange) * 60 * 60 * 1000);
+
       const params = new URLSearchParams({ 
         location: selectedLocations.join(','), 
-        from: new Date(from).toISOString(), 
-        to: new Date(to).toISOString() 
+        from: fromDate.toISOString(), 
+        to: toDate.toISOString() 
       });
       const response = await fetch(`/api/getdata?${params.toString()}`);
       const result = await response.json();
@@ -104,7 +110,7 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
     } finally {
       setLoading(false);
     }
-  }, [selectedLocations, from, to, onLogout]);
+  }, [selectedLocations, timeRange, onLogout]);
 
   useEffect(() => {
     fetchData();
@@ -112,7 +118,12 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
 
   const formatXAxis = (tickItem: string) => {
     const date = new Date(tickItem);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
+    if (parseInt(timeRange) > 24) {
+      options.day = '2-digit';
+      options.month = '2-digit';
+    }
+    return date.toLocaleTimeString([], options);
   };
 
   const formatTooltip = (value: any) => [`${value} spots`, ''];
@@ -150,21 +161,18 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
         </div>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-          <label style={{ fontSize: '12px', fontWeight: 'bold' }}>From</label>
-          <input 
-            type="datetime-local" 
-            value={from} 
-            onChange={(e) => setFrom(e.target.value)} 
-          />
-        </div>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-          <label style={{ fontSize: '12px', fontWeight: 'bold' }}>To</label>
-          <input 
-            type="datetime-local" 
-            value={to} 
-            onChange={(e) => setTo(e.target.value)} 
-          />
+          <label style={{ fontSize: '12px', fontWeight: 'bold' }}>Time Range</label>
+          <select 
+            value={timeRange} 
+            onChange={(e) => setTimeRange(e.target.value)}
+            style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
+          >
+            {TIME_RANGES.map(range => (
+              <option key={range.value} value={range.value}>
+                {range.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
