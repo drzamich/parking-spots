@@ -1,8 +1,8 @@
 import { AutoRouter, IRequest } from "itty-router";
-import { handleScrape } from "./api/scrape";
-import { handleGetData } from "./api/getData";
-import { handleLogin } from "./api/loginHandler";
-import { withAuth } from "./api/middleware/auth";
+import { handleScrape } from "./api/handleScrape";
+import { handleGetData } from "./api/handleGetData";
+import { handleLogin } from "./api/handleLogin";
+import { withAuth } from "./api/middleware/withAuth";
 import { Env } from "./types";
 
 const router = AutoRouter();
