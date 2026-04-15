@@ -67,6 +67,20 @@ export default {
 
     // Manual trigger via /scrape endpoint
     if (url.pathname === "/scrape") {
+      const password = url.searchParams.get("password");
+      if (password !== env.PASSWORD) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Unauthorized: Invalid password",
+          }),
+          {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
       try {
         const result = await runScraper(env);
         return new Response(

@@ -4,6 +4,20 @@ This application is a Cloudflare worker which has a task of scraping the number 
 
 ### Development
 
+#### Secrets
+
+API endpoints are guarded with a `PASSWORD` to prevent unathorized access. To setup the `PASSWORD` run
+
+```
+npx wrangler secret put PASSWORD
+```
+
+This creates a secret only on the cloud. To be able to use it localy, create a `.dev.vars` file and put the contents there
+
+```
+PASSWORD=<YOUR_PASSWORD>
+```
+
 #### Running locally
 
 ```
