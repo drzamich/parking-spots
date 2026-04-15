@@ -2,16 +2,23 @@
 
 This application is a Cloudflare worker which has a task of scraping the number of free parking spots from a website. It runs on a schedule, every 30 minutes. It's job is to access a website which shows the free parking spots and save it to a database. All should run on Cloudflare Workers.
 
-### Local development
+### Development
 
-#### Run the app
-
-```
-pnpm wrangler dev
-```
-
-#### Query the DB
+#### Running locally
 
 ```
-pnpm wrangler d1 execute parking_spots  --local --command "SELECT * from parking_spots"
+npx wrangler dev
+```
+
+#### Querying the DB
+
+1. Write the query to `src/adhoc-query.sql`
+2. Run
+   1. For local DB: `pnpm run adhocquery:local`
+   2. For remote DB: `pnpm run adhocquery:remote`
+
+#### Deploy
+
+```
+npx wrangler deploy
 ```
