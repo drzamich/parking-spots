@@ -3,11 +3,11 @@ import { Env } from "../types";
 
 export const handleGetData = async (request: IRequest, env: Env): Promise<Response> => {
   const { searchParams } = new URL(request.url);
-  const location = searchParams.get("location");
+  const locationsParam = searchParams.get("location");
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
-  if (!location || !from || !to) {
+  if (!locationsParam || !from || !to) {
     return new Response(
       JSON.stringify({
         success: false,
@@ -20,12 +20,16 @@ export const handleGetData = async (request: IRequest, env: Env): Promise<Respon
     );
   }
 
+  const locations = locationsParam.split(",");
+
   try {
+    // Construct the IN clause placeholders
+    const placeholders = locations.map(() => "?").join(",");
+    const query = `SELECT * FROM parking_spots WHERE location IN (${placeholders}) AND datetime(timestamp) BETWEEN datetime(?) AND datetime(?) ORDER BY timestamp DESC`;
+
     const { results } = await env.parking_spots_db
-      .prepare(
-        "SELECT * FROM parking_spots WHERE location = ? AND datetime(timestamp) BETWEEN datetime(?) AND datetime(?) ORDER BY timestamp DESC",
-      )
-      .bind(location, from, to)
+      .prepare(query)
+      .bind(...locations, from, to)
       .all();
 
     return new Response(JSON.stringify(results), {

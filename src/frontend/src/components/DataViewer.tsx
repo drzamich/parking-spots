@@ -21,14 +21,27 @@ interface ParkingData {
   timestamp: string;
 }
 
+interface ChartDataPoint {
+  timestamp: string;
+  [key: string]: string | number;
+}
+
+const LOCATIONS = [
+  { id: 'krasinski', label: 'Krasiński' },
+  { id: 'warynskiego', label: 'Waryńskiego' }
+];
+
+const COLORS = {
+  krasinski: '#007bff',
+  warynskiego: '#28a745'
+};
+
 export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
-  const [data, setData] = useState<ParkingData[]>([]);
+  const [data, setData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>(['krasinski']);
 
-  const [location, setLocation] = useState('krasinski');
-  
-  // Default range: last 24 hours
   const [from, setFrom] = useState(() => {
     const date = new Date();
     date.setHours(date.getHours() - 24);
@@ -36,12 +49,24 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
   });
   const [to, setTo] = useState(() => new Date().toISOString().slice(0, 16));
 
+  const toggleLocation = (locationId: string) => {
+    setSelectedLocations(prev => 
+      prev.includes(locationId) 
+        ? prev.filter(id => id !== locationId) 
+        : [...prev, locationId]
+    );
+  };
+
   const fetchData = useCallback(async () => {
+    if (selectedLocations.length === 0) {
+      setData([]);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams({ 
-        location, 
+        location: selectedLocations.join(','), 
         from: new Date(from).toISOString(), 
         to: new Date(to).toISOString() 
       });
@@ -53,20 +78,34 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
         throw new Error(result.error || `HTTP error! status: ${response.status}`);
       }
       
-      // Sort data by timestamp ascending for the chart
-      const sortedData = (result as ParkingData[]).sort(
+      const rawData = result as ParkingData[];
+      
+      // Group by timestamp to display multiple lines
+      const groupedData: Record<string, ChartDataPoint> = {};
+      
+      rawData.forEach(item => {
+        // Use a 5-minute bucket or similar if timestamps don't align perfectly, 
+        // but for now, let's assume they align from the scraper.
+        const ts = item.timestamp;
+        if (!groupedData[ts]) {
+          groupedData[ts] = { timestamp: ts };
+        }
+        groupedData[ts][item.location] = item.free_spots;
+      });
+
+      const chartData = Object.values(groupedData).sort(
         (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
-      setData(sortedData);
+      
+      setData(chartData);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setData([]);
     } finally {
       setLoading(false);
     }
-  }, [location, from, to, onLogout]);
+  }, [selectedLocations, from, to, onLogout]);
 
-  // Automatically fetch when parameters change
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -76,7 +115,7 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const formatTooltip = (value: any) => [`${value} spots`, 'Free Spots'];
+  const formatTooltip = (value: any) => [`${value} spots`, ''];
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
@@ -89,17 +128,25 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
         marginBottom: '30px', 
         display: 'flex', 
         flexWrap: 'wrap', 
-        gap: '15px', 
+        gap: '20px', 
         padding: '15px',
         backgroundColor: '#f8f9fa',
         borderRadius: '8px'
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-          <label style={{ fontSize: '12px', fontWeight: 'bold' }}>Location</label>
-          <select value={location} onChange={(e) => setLocation(e.target.value)}>
-            <option value="krasinski">Krasiński</option>
-            <option value="warynskiego">Waryńskiego</option>
-          </select>
+          <label style={{ fontSize: '12px', fontWeight: 'bold' }}>Locations</label>
+          <div style={{ display: 'flex', gap: '10px', paddingTop: '5px' }}>
+            {LOCATIONS.map(loc => (
+              <label key={loc.id} style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={selectedLocations.includes(loc.id)} 
+                  onChange={() => toggleLocation(loc.id)} 
+                />
+                {loc.label}
+              </label>
+            ))}
+          </div>
         </div>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -145,27 +192,31 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
                 formatter={formatTooltip}
               />
               <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="free_spots" 
-                name="Free Spots"
-                stroke="#007bff" 
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 6 }}
-                animationDuration={500}
-              />
+              {selectedLocations.map(locId => (
+                <Line 
+                  key={locId}
+                  type="monotone" 
+                  dataKey={locId} 
+                  name={LOCATIONS.find(l => l.id === locId)?.label}
+                  stroke={COLORS[locId as keyof typeof COLORS]} 
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                  animationDuration={500}
+                  connectNulls
+                />
+              ))}
             </LineChart>
           </ResponsiveContainer>
         ) : (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#666' }}>
-            {loading ? 'Loading chart data...' : 'No data available for the selected range.'}
+            {loading ? 'Loading chart data...' : 'No data available for the selected locations and range.'}
           </div>
         )}
       </div>
 
       <div style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
-        Found {data.length} records.
+        Found data points for {selectedLocations.length} locations.
       </div>
     </div>
   );
