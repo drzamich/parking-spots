@@ -1,4 +1,4 @@
-import { Env, ParkingSpot } from "./types";
+import { Env, ParkingSpot } from "../types";
 import { scrapeParkingSpots } from "./scrapeParkingSpots";
 
 /**

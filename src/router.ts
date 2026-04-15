@@ -1,22 +1,21 @@
-import { AutoRouter } from "itty-router";
-import { handleScrape } from "./handlers/scrape";
-import { handleGetData } from "./handlers/getData";
-import { withAuth } from "./handlers/auth";
+import { AutoRouter, IRequest } from "itty-router";
+import { handleScrape } from "./api/scrape";
+import { handleGetData } from "./api/getData";
+import { withAuth } from "./api/middleware/auth";
+import { Env } from "./types";
 
 const router = AutoRouter();
 
-router.all("*", withAuth);
+// Protected API routes
+router.get("/api/scrape", withAuth, handleScrape);
+router.get("/api/getdata", withAuth, handleGetData);
 
-router.get("/scrape", handleScrape);
-router.get("/getdata", handleGetData);
-
+// Fallback to static assets (frontend)
 router.all(
   "*",
-  () =>
-    new Response(
-      "Parking spot scraper worker is running. Use /scrape to trigger manually or /getdata to retrieve records.",
-      { status: 404 },
-    ),
+  (request: IRequest, env: Env) => {
+    return env.ASSETS.fetch(request);
+  }
 );
 
 export { router };

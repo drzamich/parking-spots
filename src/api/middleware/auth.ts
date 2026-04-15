@@ -1,5 +1,5 @@
 import { IRequest } from "itty-router";
-import { Env } from "../types";
+import { Env } from "../../types";
 
 export const withAuth = async (request: IRequest, env: Env): Promise<Response | void> => {
   const { searchParams } = new URL(request.url);

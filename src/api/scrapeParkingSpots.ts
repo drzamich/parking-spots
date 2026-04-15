@@ -1,4 +1,4 @@
-import { ParkingSpot, Location } from "./types";
+import { ParkingSpot, Location } from "../types";
 
 export async function scrapeParkingSpots(): Promise<ParkingSpot[]> {
   const url = "https://zdm.waw.pl/sprawy/parkowanie/parkingi-podziemne/";

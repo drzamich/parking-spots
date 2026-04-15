@@ -1,6 +1,7 @@
 export interface Env {
   parking_spots_db: D1Database;
   PASSWORD: string;
+  ASSETS: Fetcher;
 }
 
 export type Location = "krasinski" | "warynskiego";

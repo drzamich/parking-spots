@@ -4,10 +4,12 @@
   "description": "Cloudflare Worker for scraping free parking spots",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "adhocquery:local": "wrangler d1 execute --local parking_spots_db --command \"$(cat src/adhocQuery.sql)\"",
-    "adhocquery:remote": "wrangler d1 execute --remote parking_spots_db --command \"$(cat src/adhocQuery.sql)\""
+    "dev": "pnpm run build && wrangler dev",
+    "build:frontend": "cd src/frontend && pnpm build",
+    "build": "pnpm build:frontend",
+    "deploy": "pnpm build && wrangler deploy",
+    "adhocquery:local": "wrangler d1 execute --local parking_spots_db --command \"$(cat src/api/adhocQuery.sql)\"",
+    "adhocquery:remote": "wrangler d1 execute --remote parking_spots_db --command \"$(cat src/api/adhocQuery.sql)\""
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260415.1",

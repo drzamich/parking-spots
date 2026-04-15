@@ -1,5 +1,5 @@
 import { Env } from "./types";
-import { runScraper } from "./runScraper";
+import { runScraper } from "./api/runScraper";
 import { router } from "./router";
 
 export default {
