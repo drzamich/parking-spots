@@ -203,7 +203,7 @@ export const DataViewer: React.FC<DataViewerProps> = ({ onLogout }) => {
               {selectedLocations.map(locId => (
                 <Line 
                   key={locId}
-                  type="monotone" 
+                  type="stepAfter" 
                   dataKey={locId} 
                   name={LOCATIONS.find(l => l.id === locId)?.label}
                   stroke={COLORS[locId as keyof typeof COLORS]} 
