@@ -1,36 +1,18 @@
-export interface Env {
-  parking_spots_db: D1Database;
-}
-
-type Location = "krasinski" | "warynskiego";
-
-interface ParkingSpot {
-  id?: number;
-  location: Location;
-  free_spots: number;
-  timestamp: string;
-}
-
-/**
- * Mock function to scrape free parking spots.
- * For now, returns an empty array.
- */
-async function scrapeParkingSpots(): Promise<ParkingSpot[]> {
-  // TODO: Implement actual scraping logic.
-  return [
-    {
-      location: "krasinski",
-      free_spots: 132,
-      timestamp: Date.now().toString(),
-    },
-  ];
-}
+import { Env, ParkingSpot } from "./types";
+import { scrapeParkingSpots } from "./scraper";
 
 /**
  * Shared logic to scrape parking spots and save them to the D1 database.
  */
 async function runScraper(env: Env): Promise<{ count: number }> {
-  const spots = await scrapeParkingSpots();
+  let spots: ParkingSpot[] = [];
+  try {
+    spots = await scrapeParkingSpots();
+  } catch (e) {
+    console.log(`Unable to scrape. Error:`, e);
+  }
+
+  console.log(spots);
 
   if (spots.length === 0) {
     console.log("No parking spots scraped.");
