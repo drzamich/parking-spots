@@ -8,4 +8,4 @@ database_name = "parking_spots_db"
 database_id = "dbe5f0ff-f2b4-43b2-ba78-af4e771797fd"
 
 [triggers]
-crons = ["*/1 * * * *"]
+crons = ["*/3 * * * *"]
