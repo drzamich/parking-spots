@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { LoginForm } from './components/LoginForm'
-import { DataViewer } from './components/DataViewer'
+
+const DataViewer = lazy(() => import('./components/DataViewer').then(module => ({ default: module.DataViewer })))
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -9,7 +10,11 @@ function App() {
     return <LoginForm onLoginSuccess={() => setIsAuthenticated(true)} />
   }
 
-  return <DataViewer onLogout={() => setIsAuthenticated(false)} />
+  return (
+    <Suspense fallback={<div style={{ padding: '20px' }}>Loading dashboard...</div>}>
+      <DataViewer onLogout={() => setIsAuthenticated(false)} />
+    </Suspense>
+  )
 }
 
 export default App
