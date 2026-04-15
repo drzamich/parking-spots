@@ -1,6 +1,6 @@
 name = "parking-spots"
 main = "src/index.ts"
-compatibility_date = "2024-10-22"
+compatibility_date = "2026-04-15"
 
 [[d1_databases]]
 binding = "parking_spots_db"
