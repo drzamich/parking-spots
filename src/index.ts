@@ -1,22 +1,6 @@
-import { AutoRouter } from "itty-router";
 import { Env } from "./types";
 import { runScraper } from "./runScraper";
-import { handleScrape } from "./handlers/scrape";
-import { handleGetData } from "./handlers/getData";
-
-const router = AutoRouter();
-
-router.get("/scrape", handleScrape);
-router.get("/getdata", handleGetData);
-
-router.all(
-  "*",
-  () =>
-    new Response(
-      "Parking spot scraper worker is running. Use /scrape to trigger manually or /getdata to retrieve records.",
-      { status: 404 },
-    ),
-);
+import { router } from "./router";
 
 export default {
   /**
